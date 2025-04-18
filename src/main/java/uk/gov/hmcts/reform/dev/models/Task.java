@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.dev.models;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,7 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 
-import java.time.LocalDateTime;
+//import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "tasks")
@@ -31,9 +30,11 @@ public class Task {
     private String status;
     private String dueDate;
 
-    Task(){}
+    Task() {
 
-    Task(String titleIn, String descriptionIn, String statusIn, String dueDateIn){
+    }
+
+    Task(String titleIn, String descriptionIn, String statusIn, String dueDateIn) {
         this.title = titleIn;
         this.description = descriptionIn != null ? descriptionIn : "";
         this.status = statusIn;

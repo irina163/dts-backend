@@ -8,63 +8,50 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.beans.factory.annotation.Autowired;
 import static org.springframework.http.ResponseEntity.ok;
 
 import uk.gov.hmcts.reform.dev.models.Task;
-import uk.gov.hmcts.reform.dev.repository.TaskRepository;
+import uk.gov.hmcts.reform.dev.service.TaskService;
 
-import java.time.LocalDateTime;
+//import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
 public class TaskController {
 
-    @Autowired
-    private final TaskRepository taskRepository;
+    private final TaskService taskService;
 
-    TaskController(TaskRepository taskRepository){
-        this.taskRepository = taskRepository;
+    TaskController(TaskService taskService) {
+        this.taskService = taskService;
     }
 
     @PostMapping("/create")
-    public Task createTask(@RequestBody Task newTask) {
-        return taskRepository.save(newTask);
+    public void createTask(@RequestBody Task newTask) {
+        taskService.createTask(newTask);
     }
 
     @GetMapping(value = "/tasks", produces = "application/json")
-    public ResponseEntity<List<Task>> getAllTasks(){
-        List<Task> tasks = taskRepository.findAll();
+    public ResponseEntity<List<Task>> getAllTasks() {
+        List<Task> tasks = taskService.getAllTasks();
         return ResponseEntity.ok(tasks);
     }
 
     @GetMapping(value = "/tasks/{id}", produces = "application/json")
     public ResponseEntity<Task> getTask(@PathVariable Long id) {
-        return taskRepository.findById(id)
+        return taskService.getTask(id)
         .map(ResponseEntity::ok)
         .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping(value = "/tasks/{id}", produces = "application/json")
-    public ResponseEntity<Task> upateTask(@RequestBody Task newTask, @PathVariable Long id){
-        return taskRepository.findById(id)
-        .map(oldTask -> {
-            oldTask.setTitle(newTask.getTitle() != null ? newTask.getTitle() : oldTask.getTitle());
-            oldTask.setDescription(newTask.getDescription() != null ? newTask.getDescription() : oldTask.getDescription());
-            oldTask.setStatus(newTask.getStatus()!= null ? newTask.getStatus() : oldTask.getStatus());
-            oldTask.setDueDate(newTask.getDueDate()!= null ? newTask.getDueDate() : oldTask.getDueDate());
-            Task updatedTask = taskRepository.save(oldTask);
-            return ResponseEntity.ok(updatedTask);
-        })
-        .orElseGet(() -> {
-            Task createTask = taskRepository.save(newTask);
-            return ResponseEntity.ok(createTask);
-      });
+    public ResponseEntity<Task> updateTask(@RequestBody Task newTask, @PathVariable Long id) {
+        Task updatedTask = taskService.updateTask(newTask, id);
+        return ResponseEntity.ok(updatedTask);
     }
 
     @DeleteMapping("/tasks/{id}")
     void deleteTask(@PathVariable Long id) {
-        taskRepository.deleteById(id);
+        taskService.deleteById(id);
     }
 
 }
